@@ -46,6 +46,8 @@ public class KurzListkyServlet extends HttpServlet {
 			}
 			fJson = fJson.substring(0,fJson.length()-1);
 			fJson += "\n]";
+			//response.addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
+			//response.addHeader("Access-Control-Allow-Origin", "*");
 			response.setCharacterEncoding("UTF-8");
 			response.getWriter().append(fJson);
 			
@@ -67,6 +69,8 @@ public class KurzListkyServlet extends HttpServlet {
 			
 			System.out.println(fJson.length());
 			fJson += "\n]";
+			//response.addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
+			//response.addHeader("Access-Control-Allow-Origin", "*");
 			response.setCharacterEncoding("UTF-8");
 			response.getWriter().append(fJson);
 		}

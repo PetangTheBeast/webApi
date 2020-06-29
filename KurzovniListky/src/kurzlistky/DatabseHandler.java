@@ -59,6 +59,8 @@ public class DatabseHandler {
 	}
 	public static List<String> mySplit(String result){
         char[] chArr = result.toCharArray(); 
+        int len = chArr.length;
+        
         List<String> fArr = new ArrayList();
         String pom = "";
         boolean skip_next = false;
@@ -68,6 +70,7 @@ public class DatabseHandler {
                 if (ch == '}') {
                     skip_next = true;
                     fArr.add(pom);
+                    //System.out.println(pom);
                     pom = "";
                 }
             }
@@ -75,13 +78,15 @@ public class DatabseHandler {
                 skip_next = false;
             }        
         }
+        //System.out.println(pom);
         return fArr;
     }
 	public List<KurzListky> getDataFromAPI() {
+		System.out.println("_____getDataFromAPI____");
 		List<KurzListky> klArr = new ArrayList<>();
 		try{
             //EntityTransaction et = em.getTransaction();
-            System.out.println("______Start_____");
+            
             
             String url = "https://www.csast.csas.cz/webapi/api/v2/rates/exchangerates?web-api-key=86d63706-3a9c-4762-bd7a-415651cc26f8";
             URL obj = new URL(url);
@@ -93,17 +98,19 @@ public class DatabseHandler {
             StringBuffer response = new StringBuffer();
             while ((inputLine = in.readLine())!= null){
                 response.append(inputLine);
-                System.out.println(inputLine);
+                //System.out.println(inputLine);
             }
             in.close();
             
             String responseString = response.toString();
-            responseString = responseString.substring(1, responseString.length()-2);
+            responseString = responseString.substring(1, responseString.length()-1);
+            //System.out.println(responseString);
             List<String> myList = mySplit(responseString);
+            System.out.println("**from jsonstring to object");
             for(String s : myList){
                 //System.out.println(s);
                 //JSONObject jsonObject = new JSONObject(s);
-                //System.out.println(jsonObject);
+                System.out.println(s);
                 
                 Gson gson = new Gson();  
                 KurzListky kl = gson.fromJson(s, KurzListky.class);  
