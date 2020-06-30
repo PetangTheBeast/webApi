@@ -12,48 +12,33 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+
 import com.google.gson.Gson;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 
 public class DatabseHandler {
+	public static final EntityManagerFactory EMF = 
+            Persistence.createEntityManagerFactory("KurzovniListky");
+	
 	public List<KurzListky> getDataFromDB(){
 		List<KurzListky> kl = new ArrayList<>();
-		try {
-			Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
-		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		try {
-			
-			Connection myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/KurzovniListkyDB?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC", "root", "1234");
-			Statement myStmt = myConn.createStatement();
-			ResultSet myRs = myStmt.executeQuery("select * from kurzovnilistky");
-			while(myRs.next()) {
-				KurzListky klpom = new KurzListky();
-				klpom.setShortName(myRs.getString("shortName"));
-				klpom.setValidFrom(myRs.getString("validFrom"));
-				klpom.setName(myRs.getString("name"));
-				klpom.setCountry(myRs.getString("country"));
-				klpom.setAmount(myRs.getInt("amount"));
-				klpom.setValBuy(myRs.getDouble("valBuy"));
-				klpom.setValSell(myRs.getDouble("valSell"));
-				klpom.setValMid(myRs.getDouble("valMid"));
-				klpom.setCurrBuy(myRs.getDouble("currBuy"));
-				klpom.setCurrSell(myRs.getDouble("currSell"));
-				klpom.setCurrMid(myRs.getDouble("currMid"));
-				klpom.setMove(myRs.getDouble("move"));
-				klpom.setCnbMid(myRs.getDouble("cnbMid"));
-				klpom.setVersion(myRs.getDouble("version"));
-				klpom.setEcbMid(myRs.getDouble("ecbMid"));
-				kl.add(klpom);
-				System.out.println(myRs.getString("name"));
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		EntityManager em = EMF.createEntityManager();
+        try{
+            EntityTransaction et = em.getTransaction();
+            TypedQuery<KurzListky> tqkl = em.createQuery("SELECT kl FROM Kurzovnilistky kl", KurzListky.class);
+            for(KurzListky klpom : tqkl.getResultList()) {
+            	kl.add(klpom);
+            }
+        }finally {
+        	em.close();
+        }
 		
 		return kl;
 	}
@@ -129,40 +114,21 @@ public class DatabseHandler {
 		return klArr;
 	}
 	public void updateDatabase(List<KurzListky> klArr) {
-		try {
-			Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
-			Connection myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/KurzovniListkyDB?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC", "root", "1234");
-			Statement myStmt = myConn.createStatement();
-			myStmt.executeUpdate("DELETE from kurzovnilistky");
-			
-			//ResultSet myRs = myStmt.executeQuery("select * from kurzovnilistky");
-			for(KurzListky kl : klArr)  {
-				String insert = "INSERT INTO Kurzovnilistky " +
-		                   "VALUES ("
-		                   + "'"+kl.getShortName()+"', "
-		                   + "'"+kl.getValidFrom()+"', "
-                		   + "'"+kl.getName()+"', "
-        				   + "'"+kl.getCountry()+"', "
-						   + kl.getAmount()+", "
-						   + kl.getValBuy()+", "
-						   + kl.getValSell()+", "
-						   + kl.getValMid()+", "
-						   + kl.getCurrBuy()+", "
-						   + kl.getCurrSell()+", "
-						   + kl.getCurrMid()+", "
-						   + kl.getMove()+", "
-						   + kl.getCnbMid()+", "
-						   + kl.getVersion()+", "
-						   + kl.getEcbMid()
-		                   + ")";
-				System.out.println(insert);
-				myStmt.executeUpdate(insert);
-				
-			}
-		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
+		EntityManager em = EMF.createEntityManager();
+        try{
+            EntityTransaction et = em.getTransaction();
+            Query q = em.createQuery("DELETE FROM Kurzovnilistky");  
+            et.begin();
+            q.executeUpdate();
+            et.commit();
+            for(KurzListky klpom : klArr) {
+            	et.begin();
+            	em.persist(klpom);
+            	et.commit();
+            }
+        }finally {
+        	em.close();
+        }
+        
 	}
 }

@@ -1,8 +1,11 @@
 package kurzlistky;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
+@Entity(name="Kurzovnilistky")
 public class KurzListky {
-	
+	@Id
 	private String shortName;
 	private String validFrom;
 	private String name;
@@ -108,6 +111,13 @@ public class KurzListky {
 	}
 	public void setEcbMid(double ecbMid) {
 		this.ecbMid = ecbMid;
+	}
+	@Override
+	public String toString() {
+		return "KurzListky [shortName=" + shortName + ", validFrom=" + validFrom + ", name=" + name + ", country="
+				+ country + ", amount=" + amount + ", valBuy=" + valBuy + ", valSell=" + valSell + ", valMid=" + valMid
+				+ ", currBuy=" + currBuy + ", currSell=" + currSell + ", currMid=" + currMid + ", move=" + move
+				+ ", cnbMid=" + cnbMid + ", version=" + version + ", ecbMid=" + ecbMid + "]";
 	}
 	
 	
